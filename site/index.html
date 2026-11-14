@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>D&amp;D RPG Adventure</title>
+<meta name="description" content="D&amp;D RPG Adventure is a free fantasy role-playing game you play in your browser. Pick a Warrior, Mage or Rogue, explore an endless world, raid dungeons and travel through four realms to face the final boss.">
+<meta property="og:title" content="D&amp;D RPG Adventure">
+<meta property="og:description" content="A free fantasy RPG in your browser. An endless world, four realms, one final boss.">
+<meta property="og:image" content="img/combat.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 4l24 10v16c0 15-10 26-24 30C18 56 8 45 8 30V14z' fill='%232c2350' stroke='%23f2c35b' stroke-width='4'/%3E%3Cpath d='M32 16l4 10h10l-8 6 3 10-9-6-9 6 3-10-8-6h10z' fill='%23f2c35b'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Alegreya+Sans:wght@400;700;800&display=swap">
+<style>
+:root{
+  --bg:#141024;
+  --bg-2:#1c1733;
+  --card:#231d3e;
+  --line:rgba(242,195,91,.16);
+  --ink:#f3ecdc;
+  --muted:rgba(243,236,220,.68);
+  --gold:#f2c35b;
+  --gold-deep:#a8761f;
+  --gold-ink:#2a1a02;
+  --nether:#e8642a;
+  --void:#9b5cff;
+  --celestial:#8fd3ff;
+  --f-display:"Cinzel",Georgia,"Times New Roman",serif;
+  --f-body:"Alegreya Sans",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--gold)}
+img{display:block;max-width:100%}
+.wrap{width:min(1120px,100% - 32px);margin-inline:auto}
+
+/* top bar */
+.nav{position:absolute;top:0;left:0;right:0;z-index:3;padding:18px 0}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--gold)}
+.nav-links{display:flex;gap:22px;font-weight:700;font-size:16px}
+.nav-links a{color:var(--ink);text-decoration:none;opacity:.85}
+.nav-links a:hover{opacity:1;color:var(--gold)}
+
+/* hero: the overworld, darkened, with a glowing portal behind the title */
+.hero{position:relative;min-height:min(92vh,820px);display:grid;place-items:center;overflow:hidden;isolation:isolate;padding:110px 0 80px;text-align:center}
+.hero-bg{position:absolute;inset:-4%;z-index:-3;background:url(img/nether.png) center/cover no-repeat;filter:blur(6px) saturate(1.1);animation:drift 40s ease-in-out infinite alternate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:
+  radial-gradient(ellipse 55% 50% at 50% 48%,rgba(20,16,36,.5),rgba(20,16,36,.9) 72%),
+  linear-gradient(180deg,rgba(20,16,36,.25),var(--bg) 98%)}
+.portal{position:absolute;z-index:-1;left:50%;top:47%;width:min(78vmin,620px);aspect-ratio:3/4;translate:-50% -50%;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(155,92,255,.32),rgba(232,100,42,.14) 48%,transparent 70%);
+  box-shadow:inset 0 0 60px rgba(155,92,255,.35);border:2px solid rgba(242,195,91,.28);animation:pulse 6s ease-in-out infinite}
+@keyframes pulse{50%{scale:1.05;border-color:rgba(242,195,91,.5);box-shadow:inset 0 0 90px rgba(232,100,42,.35)}}
+@keyframes drift{from{transform:scale(1.04)}to{transform:scale(1.1) translate(-1.5%,1%)}}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);background:rgba(0,0,0,.4);padding:6px 14px;border-radius:999px;border:1px solid var(--line)}
+.kicker svg{width:14px;height:14px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(44px,8.6vw,104px);line-height:1;margin:20px 0 0;letter-spacing:.02em;text-shadow:0 4px 0 rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.6)}
+h1 .amp{color:var(--gold)}
+h1 small{display:block;font-size:.42em;letter-spacing:.32em;margin-top:.25em;color:var(--gold);font-weight:600}
+.lede{max-width:620px;margin:22px auto 0;font-size:clamp(18px,2.2vw,22px);text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;border-radius:6px;font:800 18px var(--f-body);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:transform .12s,box-shadow .12s,background .12s}
+.btn-play{background:linear-gradient(180deg,#ffd77a,var(--gold));color:var(--gold-ink);box-shadow:0 5px 0 var(--gold-deep),0 12px 30px rgba(242,195,91,.25);font-size:21px;min-height:62px;padding:0 42px}
+.btn-play:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--gold-deep),0 16px 36px rgba(242,195,91,.32)}
+.btn-play:active{transform:translateY(3px);box-shadow:0 2px 0 var(--gold-deep)}
+.btn-play svg{width:20px;height:20px}
+.btn-ghost{color:var(--ink);background:rgba(0,0,0,.4);border:1px solid rgba(243,236,220,.25)}
+.btn-ghost:hover{background:rgba(0,0,0,.55);border-color:rgba(243,236,220,.45)}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.meta{margin-top:18px;font-size:15px;color:var(--muted)}
+
+/* stats strip */
+.stats{border-block:1px solid var(--line);background:var(--bg-2)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}
+.stat{padding:22px 8px}
+.stat + .stat{border-left:1px solid var(--line)}
+.stat b{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4vw,40px);color:var(--gold);line-height:1.1}
+.stat span{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+
+section{padding:88px 0}
+h2{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,4.6vw,46px);line-height:1.1;margin:0 0 12px}
+.sub{color:var(--muted);max-width:640px;margin:0 0 40px}
+
+/* features: alternating screenshot rows */
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center}
+.feature + .feature{margin-top:72px}
+.feature.flip .shot{order:2}
+.shot{border-radius:8px;overflow:hidden;border:2px solid rgba(242,195,91,.3);box-shadow:0 20px 50px rgba(0,0,0,.5);background:#000}
+.shot img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+.feature h3{font-family:var(--f-display);font-weight:800;font-size:27px;margin:0 0 10px;line-height:1.15}
+.feature p{margin:0 0 14px;color:var(--muted)}
+.feature ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.feature li{display:flex;gap:10px;align-items:baseline}
+.feature li::before{content:"";flex:none;width:8px;height:8px;rotate:45deg;background:var(--gold);translate:0 -2px}
+
+/* realms */
+.realms{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.realm{position:relative;border-radius:10px;padding:20px 18px 18px;background:var(--card);border:1px solid var(--line);overflow:hidden}
+.realm::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--c)}
+.realm .n{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.realm h3{font-family:var(--f-display);font-weight:800;font-size:22px;margin:4px 0 6px}
+.realm p{margin:0;color:var(--muted);font-size:16px}
+
+/* class cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px}
+.card .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(242,195,91,.12);color:var(--gold);margin-bottom:14px;border:1px solid var(--line)}
+.card .ico svg{width:22px;height:22px}
+.card h3{margin:0 0 6px;font-family:var(--f-display);font-size:21px}
+.card p{margin:0;color:var(--muted);font-size:17px}
+
+/* controls */
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;margin:0;align-items:center}
+.keys dt{display:flex;gap:4px;flex-wrap:wrap}
+.keys dd{margin:0;color:var(--muted)}
+kbd{display:inline-block;min-width:30px;padding:3px 8px;border-radius:5px;background:#2f2752;border:1px solid rgba(243,236,220,.16);border-bottom-width:3px;font:800 14px var(--f-body);text-align:center;color:var(--ink)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px}
+.panel h3{margin:0 0 8px;font-family:var(--f-display);font-size:21px}
+.panel p{margin:0 0 14px;color:var(--muted)}
+.panel p:last-child{margin:0}
+pre{margin:0 0 14px;background:#0e0b1a;border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font:15px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#e6dcc4}
+pre .c{color:#8a7fae}
+
+/* final call */
+.final{text-align:center;background:radial-gradient(ellipse 50% 80% at 50% 100%,rgba(155,92,255,.16),transparent 70%),var(--bg-2);border-top:1px solid var(--line)}
+.final h2{margin-bottom:10px}
+.final p{color:var(--muted);margin:0 0 28px}
+footer{padding:28px 0 40px;color:var(--muted);font-size:15px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width:900px){
+  .feature,.feature.flip{grid-template-columns:1fr;gap:22px}
+  .feature.flip .shot{order:0}
+  .realms{grid-template-columns:1fr 1fr}
+  .cards{grid-template-columns:1fr}
+  .controls{grid-template-columns:1fr}
+  section{padding:64px 0}
+}
+@media (max-width:560px){
+  .nav-links a:not(.gh){display:none}
+  .hero{min-height:auto;padding:120px 0 90px}
+  .portal{width:110vw}
+  .stats .wrap{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--line)}
+  .realms{grid-template-columns:1fr}
+  .btn-play,.cta .btn-ghost{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-bg,.portal{animation:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="./">D<span>&amp;</span>D RPG ADVENTURE</a>
+    <nav class="nav-links" aria-label="Page">
+      <a href="#features">Features</a>
+      <a href="#realms">Realms</a>
+      <a href="#controls">Controls</a>
+      <a class="gh" href="https://github.com/br672i-blip/dnd-rpg-adventure">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="title">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="portal" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="kicker"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.9L22 9.6l-5.4 4.8L18.2 22 12 18.3 5.8 22l1.6-7.6L2 9.6l7.1-.7z"/></svg>Free fantasy RPG in your browser</span>
+      <h1 id="title">D<span class="amp">&amp;</span>D RPG<small>ADVENTURE</small></h1>
+      <p class="lede">Choose a Warrior, Mage or Rogue and set out into an endless world. Raid dungeons, gear up in town, and cross four realms to face Solgareth, the Fallen.</p>
+      <div class="cta">
+        <a class="btn btn-play" href="play/">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.52.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+          Play now
+        </a>
+        <a class="btn btn-ghost" href="#features">Explore the world</a>
+      </div>
+      <p class="meta">No download or sign-up. Best with a keyboard. Your progress is saved in your browser.</p>
+    </div>
+  </section>
+
+  <div class="stats" role="list">
+    <div class="wrap">
+      <div class="stat" role="listitem"><b>3</b><span>Classes</span></div>
+      <div class="stat" role="listitem"><b>4</b><span>Realms</span></div>
+      <div class="stat" role="listitem"><b>4</b><span>Dungeon types</span></div>
+      <div class="stat" role="listitem"><b>∞</b><span>World to explore</span></div>
+    </div>
+  </div>
+
+  <section id="features" aria-labelledby="features-h">
+    <div class="wrap">
+      <h2 id="features-h">An adventure without an edge</h2>
+      <p class="sub">The map keeps generating as you walk, and monsters get tougher the farther you travel from home.</p>
+
+      <div class="feature">
+        <div class="shot"><img src="img/overworld.png" width="1024" height="768" alt="The starting village in the overworld, with an inn, blacksmith, temple, library and a glowing Nether Portal" loading="lazy"></div>
+        <div>
+          <h3>Towns, quests and loot</h3>
+          <p>Every realm has a town to rest, shop and take on work from the locals.</p>
+          <ul>
+            <li>Buy and sell gear at the shop, and upgrade it at the blacksmith's forge</li>
+            <li>Take quests from villagers and track them in your journal</li>
+            <li>Trade Soul Shards for blessings at the temple</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature flip">
+        <div class="shot"><img src="img/combat.png" width="1024" height="768" alt="A turn-based battle between the player and a level 4 Goblin, with Attack, Fireball, Heal, Items and Run buttons" loading="lazy"></div>
+        <div>
+          <h3>Turn-based battles</h3>
+          <p>Walk into a monster and the fight begins. Pick your moves carefully, because the enemy hits back.</p>
+          <ul>
+            <li>Attack, cast Fireball, heal, use items or run</li>
+            <li>Goblins and wolves near home, dragons and vampires far away</li>
+            <li>Level up for more health and mana, and unlock a class ultimate at level 10</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature">
+        <div class="shot"><img src="img/dungeon.png" width="1024" height="768" alt="Inside the Cursed Crypt, a dark purple dungeon with shadow beasts closing in on the player" loading="lazy"></div>
+        <div>
+          <h3>Real-time dungeons</h3>
+          <p>Dungeons switch to real-time action: move, strike and dodge through two rooms of enemies, then claim the chests.</p>
+          <ul>
+            <li>Abandoned Kingdom, Cursed Crypt, Bandit Hideout and Dragon's Lair</li>
+            <li>Pillars and cover to fight around</li>
+            <li>Better rewards in higher-tier dungeons</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="realms" aria-labelledby="realms-h" style="padding-top:0">
+    <div class="wrap">
+      <h2 id="realms-h">Four realms, one final boss</h2>
+      <p class="sub">Each portal leads somewhere more dangerous. At the end of the road waits Solgareth, the Fallen, in a sealed arena with no escape.</p>
+      <div class="realms">
+        <div class="realm" style="--c:#7bd36a"><span class="n">Realm I</span><h3>Overworld</h3><p>Meadows, forests and deserts full of goblins, wolves, orcs and trolls.</p></div>
+        <div class="realm" style="--c:var(--nether)"><span class="n">Realm II</span><h3>Nether</h3><p>Ash and lava, ruled by imps, demons and fire giants.</p></div>
+        <div class="realm" style="--c:var(--void)"><span class="n">Realm III</span><h3>Void</h3><p>A starless dark where wraiths, shadow beasts and void lords hunt.</p></div>
+        <div class="realm" style="--c:var(--celestial)"><span class="n">Realm IV</span><h3>Celestial</h3><p>Fallen angels and seraphs guard the way to the final battle.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="classes-h" style="padding-top:0">
+    <div class="wrap">
+      <h2 id="classes-h">Choose your hero</h2>
+      <p class="sub">Then pick a difficulty from Easy to Nightmare.</p>
+      <div class="cards">
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/></svg></div>
+          <h3>Warrior</h3>
+          <p>The most health and strength. Raises a Shield Block to soak hits, and unleashes Whirlwind at level 10.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/><path d="M19 17l.8 2 2 .8-2 .8L19 23l-.8-2.4-2-.8 2-.8z"/></svg></div>
+          <h3>Mage</h3>
+          <p>Fragile but deadly, with by far the most mana for fireballs and healing. Calls down a Meteor at level 10.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></div>
+          <h3>Rogue</h3>
+          <p>Fast, with the most stamina and dexterity. Escapes with Super Dash and strikes from the dark with Shadow Strike at level 10.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="controls" aria-labelledby="controls-h" style="padding-top:0">
+    <div class="wrap controls">
+      <div>
+        <h2 id="controls-h">Controls</h2>
+        <p class="sub" style="margin-bottom:24px">Click the game once so it can hear your keyboard.</p>
+        <dl class="keys">
+          <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move (arrow keys work too)</dd>
+          <dt><kbd>Shift</kbd></dt><dd>Sprint</dd>
+          <dt><kbd>E</kbd></dt><dd>Interact, enter buildings, loot</dd>
+          <dt><kbd>I</kbd></dt><dd>Inventory</dd>
+          <dt><kbd>J</kbd></dt><dd>Quest journal</dd>
+          <dt><kbd>H</kbd></dt><dd>Heal (10 MP)</dd>
+          <dt><kbd>Space</kbd></dt><dd>Attack in dungeons</dd>
+          <dt><kbd>B</kbd><kbd>Q</kbd></dt><dd>Class skill, ultimate (level 10)</dd>
+          <dt><kbd>F5</kbd></dt><dd>Save the game</dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <h3>Good to know</h3>
+        <p>The first load takes a few seconds while the game engine downloads. After that it starts quickly.</p>
+        <p>Saves are stored in your browser, with three slots. Clearing your browser data erases them, and they don't carry over between browsers or devices.</p>
+        <p>Prefer a desktop window? Run it with Python:</p>
+<pre><span class="c"># needs Python 3.12 or newer</span>
+git clone https://github.com/br672i-blip/dnd-rpg-adventure
+cd dnd-rpg-adventure
+pip install -r requirements.txt
+python pygame_DnD_RPG_infinite_map_v2.py</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" aria-labelledby="final-h">
+    <div class="wrap">
+      <h2 id="final-h">Your quest awaits.</h2>
+      <p>Create a hero and step through the first portal.</p>
+      <a class="btn btn-play" href="play/">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.52.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+        Play now
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>D&amp;D RPG Adventure: a fan-made game built with Python and pygame.</span>
+    <a href="https://github.com/br672i-blip/dnd-rpg-adventure">Source on GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>

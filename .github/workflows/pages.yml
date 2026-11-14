@@ -1,0 +1,43 @@
+# Publishes the site to GitHub Pages on every push to main: the landing page from site/ at the root,
+# and the game at /play/, compiled to WebAssembly with pygbag so it runs in the browser.
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the game for the web
+        run: |
+          pip install pygbag==0.9.3
+          # pygbag wants a folder with main.py in it
+          mkdir -p web/dnd-rpg-adventure
+          cp pygame_DnD_RPG_infinite_map_v2.py web/dnd-rpg-adventure/main.py
+          python -m pygbag --build --ume_block 0 --width 1024 --height 768 --title "D&D RPG Adventure" web/dnd-rpg-adventure
+      - name: Assemble site
+        run: |
+          mkdir -p _site/play
+          cp -r site/. _site/
+          cp -r web/dnd-rpg-adventure/build/web/. _site/play/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

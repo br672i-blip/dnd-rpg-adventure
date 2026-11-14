@@ -1,0 +1,12 @@
+# local Python environment and caches
+.venv/
+__pycache__/
+# your own save games stay on this computer
+*.pkl
+*.meta.txt
+# local tool settings and build output
+.claude/
+build/
+_site/
+# older development copy of the game
+pygame_DnD_RPG_infinite_map_wsl_dev.py
